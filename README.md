@@ -1,6 +1,8 @@
 # Unichain Node Guide
 
+## Join Diskusi Channel on Telegram
 
+https://t.me/airdrop_node
 
 ## Pre requisite
 
@@ -74,3 +76,6 @@ cat ~/unichain-node/geth-data/geth/nodekey
 ```
 
 Done
+## Join Diskusi Channel on Telegram
+
+https://t.me/airdrop_node
