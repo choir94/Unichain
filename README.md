@@ -27,7 +27,7 @@ git clone https://github.com/Uniswap/unichain-node.git
 
 "Ensure you have an Ethereum L1 full node RPC available, and set `OP_NODE_L1_ETH_RPC` & `OP_NODE_L1_BEACON` (in the `.env.sepolia` file). If running your own L1 node, it needs to be synced before Unichain will be able to fully sync"
 
-You can use infera or quicknode select sepolia and copy the RPC url
+You can use infura or quicknode select sepolia and copy the RPC url
 
 ```
 cd unichain-node && nano .env.sepolia
