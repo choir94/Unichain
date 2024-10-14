@@ -76,13 +76,6 @@ install_uniswap_dependencies() {
     forge install uniswap/v4-periphery || { echo "Failed to install Uniswap v4-periphery"; exit 1; }
 }
 
-# Function to clone the Uniswap v4 template repository
-clone_uniswap_template() {
-    echo "Cloning Uniswap v4 template..."
-    git clone https://github.com/uniswapfoundation/v4-template.git ~/foundry/uniswap-template || { echo "Failed to clone Uniswap template"; exit 1; }
-    cd ~/foundry/uniswap-template || { echo "Directory ~/foundry/uniswap-template not found"; exit 1; }
-}
-
 # Function to install necessary dependencies from the cloned template
 install_template_dependencies() {
     echo "Installing template dependencies..."
@@ -202,8 +195,7 @@ compile_contract() {
 
 # Function to explore the deployment on Uniswap
 explore_deployment() {
-    # Placeholder for transaction hash display
-    local tx_hash="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"  # Example transaction hash
+    local tx_hash="0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"  # Placeholder transaction hash
     echo "Your deployment transaction hash: $tx_hash"
     echo "Exploring your deployment on Uniswap: https://sepolia.uniscan.xyz/"
 }
@@ -217,11 +209,10 @@ main() {
     setup_foundry_toml
     create_gitignore
     install_uniswap_dependencies
-    clone_uniswap_template
     install_template_dependencies
     create_contract
     compile_contract
-    explore_deployment  # Explore the deployment
+    explore_deployment
     echo "Installation and setup complete!"
 }
 
