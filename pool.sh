@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Define the foundry path
+FOUNDRY_PATH=~/foundry
+
 # Function to check and install Node.js and npm
 install_nodejs_npm() {
     if ! command -v node &> /dev/null; then
@@ -30,10 +33,10 @@ check_forge() {
 
 # Function to set up foundry.toml configuration
 setup_foundry_toml() {
-    if [ ! -f "$HOME/foundry/foundry.toml" ]; then  # Check if foundry.toml already exists
+    if [ ! -f "$FOUNDRY_PATH/foundry.toml" ]; then  # Check if foundry.toml already exists
         echo "Setting up foundry.toml..."
-        mkdir -p ~/foundry  # Create the foundry directory if it doesn't exist
-        cat <<EOL > ~/foundry/foundry.toml
+        mkdir -p "$FOUNDRY_PATH"  # Create the foundry directory if it doesn't exist
+        cat <<EOL > "$FOUNDRY_PATH/foundry.toml"
 [rpc_endpoints]
 unichain = "https://sepolia.unichain.org"
 EOL
@@ -43,45 +46,10 @@ EOL
     fi
 }
 
-# Function to create a .gitignore file
-create_gitignore() {
-    if [ ! -f "$HOME/foundry/.gitignore" ]; then  # Check if .gitignore already exists
-        echo "Creating .gitignore file..."
-        cat <<EOL > ~/foundry/.gitignore
-# Node.js dependencies
-node_modules/
-npm-debug.log
-
-# Environment variables
-.env
-
-# Build artifacts
-build/
-out/
-target/
-
-# Foundry artifacts
-foundry/
-
-# VSCode settings
-.vscode/
-
-# Mac system files
-.DS_Store
-
-# Logs
-*.log
-EOL
-        echo ".gitignore file created successfully."
-    else
-        echo ".gitignore file already exists."
-    fi
-}
-
 # Function to install Uniswap dependencies
 install_uniswap_dependencies() {
     echo "Installing Uniswap v4 dependencies..."
-    cd ~/foundry || { echo "Directory ~/foundry not found"; exit 1; }
+    cd "$FOUNDRY_PATH" || { echo "Directory $FOUNDRY_PATH not found"; exit 1; }
 
     # Check if the directory is a Git repository
     if [ ! -d ".git" ]; then
@@ -89,13 +57,15 @@ install_uniswap_dependencies() {
         git init || { echo "Failed to initialize Git repository"; exit 1; }
     fi
 
-    if ! forge list | grep -q "uniswap/v4-core"; then
+    # Check if Uniswap v4-core is already installed
+    if [ ! -d "lib/v4-core" ]; then
         forge install uniswap/v4-core || { echo "Failed to install Uniswap v4-core"; exit 1; }
     else
         echo "Uniswap v4-core is already installed."
     fi
 
-    if ! forge list | grep -q "uniswap/v4-periphery"; then
+    # Check if Uniswap v4-periphery is already installed
+    if [ ! -d "lib/v4-periphery" ]; then
         forge install uniswap/v4-periphery || { echo "Failed to install Uniswap v4-periphery"; exit 1; }
     else
         echo "Uniswap v4-periphery is already installed."
@@ -105,7 +75,7 @@ install_uniswap_dependencies() {
 # Function to install necessary dependencies from the cloned template
 install_template_dependencies() {
     echo "Installing template dependencies..."
-    if [ -f "package.json" ]; then  # Check if package.json exists before running npm install
+    if [ -f "$FOUNDRY_PATH/package.json" ]; then  # Check if package.json exists before running npm install
         npm install || { echo "Failed to install template dependencies"; exit 1; }
     else
         echo "No package.json found. Skipping template dependencies installation."
@@ -120,9 +90,9 @@ get_private_key() {
 
 # Function to create a Solidity file for the Uniswap pool manager contract
 create_contract() {
-    if [ ! -f "$HOME/foundry/UniswapPoolManager.sol" ]; then  # Check if the contract already exists
+    if [ ! -f "$FOUNDRY_PATH/UniswapPoolManager.sol" ]; then  # Check if the contract already exists
         echo "Creating UniswapPoolManager.sol contract..."
-        cat <<EOL > ~/foundry/UniswapPoolManager.sol
+        cat <<EOL > "$FOUNDRY_PATH/UniswapPoolManager.sol"
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
@@ -223,7 +193,7 @@ EOL
 # Function to compile the contract using Foundry
 compile_contract() {
     echo "Compiling the contract..."
-    cd ~/foundry || { echo "Directory ~/foundry not found"; exit 1; }
+    cd "$FOUNDRY_PATH" || { echo "Directory $FOUNDRY_PATH not found"; exit 1; }
     forge build || { echo "Failed to compile the contract"; exit 1; }
 }
 
@@ -241,13 +211,10 @@ main() {
     install_foundry
     check_forge
     setup_foundry_toml
-    create_gitignore
     install_uniswap_dependencies
+    install_template_dependencies
     create_contract
     compile_contract
-    explore_deployment
-    echo "Installation and setup complete!"
 }
 
-# Execute the main function
 main
