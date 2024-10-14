@@ -12,10 +12,9 @@ install_nodejs_npm() {
 
 # Function to install Foundry
 install_foundry() {
-    if ! [ -d "$HOME/.foundry" ]; then  # Check if Foundry is already installed
-        echo "Installing Foundry..."
-        curl -L https://foundry.paradigm.xyz | bash || { echo "Failed to install Foundry"; exit 1; }
-        source ~/.bashrc  # Load Foundry's environment variables to the current session
+    if ! command -v forge &> /dev/null; then
+        echo "Foundry is not installed. Installing now..."
+        source <(wget -O - https://raw.githubusercontent.com/choir94/Airdropguide/refs/heads/main/Foundry.sh)
     else
         echo "Foundry is already installed."
     fi
