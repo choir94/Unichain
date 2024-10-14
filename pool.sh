@@ -20,11 +20,19 @@ install_foundry() {
     fi
 }
 
+# Function to check if Forge is installed
+check_forge() {
+    if ! command -v forge &> /dev/null; then
+        echo "Forge is not installed. Please make sure Foundry is installed correctly."
+        exit 1
+    fi
+}
+
 # Function to set up foundry.toml configuration
 setup_foundry_toml() {
-    if [ ! -f "$HOME/foundry/foundry.toml" ]; then
+    if [ ! -f "$HOME/foundry/foundry.toml" ]; then  # Check if foundry.toml already exists
         echo "Setting up foundry.toml..."
-        mkdir -p ~/foundry
+        mkdir -p ~/foundry  # Create the foundry directory if it doesn't exist
         cat <<EOL > ~/foundry/foundry.toml
 [rpc_endpoints]
 unichain = "https://sepolia.unichain.org"
@@ -37,7 +45,7 @@ EOL
 
 # Function to create a .gitignore file
 create_gitignore() {
-    if [ ! -f "$HOME/foundry/.gitignore" ]; then
+    if [ ! -f "$HOME/foundry/.gitignore" ]; then  # Check if .gitignore already exists
         echo "Creating .gitignore file..."
         cat <<EOL > ~/foundry/.gitignore
 # Node.js dependencies
@@ -81,19 +89,23 @@ install_uniswap_dependencies() {
         git init || { echo "Failed to initialize Git repository"; exit 1; }
     fi
 
-    for dependency in "uniswap/v4-core" "uniswap/v4-periphery"; do
-        if ! forge list | grep -q "$dependency"; then
-            forge install "$dependency" || { echo "Failed to install $dependency"; exit 1; }
-        else
-            echo "$dependency is already installed."
-        fi
-    done
+    if ! forge list | grep -q "uniswap/v4-core"; then
+        forge install uniswap/v4-core || { echo "Failed to install Uniswap v4-core"; exit 1; }
+    else
+        echo "Uniswap v4-core is already installed."
+    fi
+
+    if ! forge list | grep -q "uniswap/v4-periphery"; then
+        forge install uniswap/v4-periphery || { echo "Failed to install Uniswap v4-periphery"; exit 1; }
+    else
+        echo "Uniswap v4-periphery is already installed."
+    fi
 }
 
 # Function to install necessary dependencies from the cloned template
 install_template_dependencies() {
     echo "Installing template dependencies..."
-    if [ -f "package.json" ]; then
+    if [ -f "package.json" ]; then  # Check if package.json exists before running npm install
         npm install || { echo "Failed to install template dependencies"; exit 1; }
     else
         echo "No package.json found. Skipping template dependencies installation."
@@ -108,7 +120,7 @@ get_private_key() {
 
 # Function to create a Solidity file for the Uniswap pool manager contract
 create_contract() {
-    if [ ! -f "$HOME/foundry/UniswapPoolManager.sol" ]; then
+    if [ ! -f "$HOME/foundry/UniswapPoolManager.sol" ]; then  # Check if the contract already exists
         echo "Creating UniswapPoolManager.sol contract..."
         cat <<EOL > ~/foundry/UniswapPoolManager.sol
 // SPDX-License-Identifier: MIT
@@ -227,6 +239,7 @@ main() {
     install_nodejs_npm
     get_private_key
     install_foundry
+    check_forge
     setup_foundry_toml
     create_gitignore
     install_uniswap_dependencies
